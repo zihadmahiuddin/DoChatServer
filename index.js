@@ -4,7 +4,6 @@ const PORT = 1234
 const mongoose = require('mongoose')
 const userSchema = require('./userschema')
 
-// let usersDb = mongoose.createConnection('mongodb://dochat:dochatsrv@ds155699.mlab.com:55699/dochat')
 let usersDb = mongoose.createConnection('mongodb://dochat:dochatsrv@localhost/usersDb')
 let User = usersDb.model('user', userSchema)
 
@@ -27,7 +26,10 @@ server.on('connection', function(client){
             })
             break
             case "signup":
-            signup(params[0], params[1], params[2], params[3])
+            signup(params[0], params[1], params[2], params[3], function(res, usr){
+                client.write(res)
+                console.log(usr)
+            })
             break
             case "message":
             console.log('The message packet has not yet implemented!')
@@ -55,7 +57,7 @@ function login(username, password, callback){
             callback('logMessage<s>Login successful!', res)
         }
         else{
-            callback('logMessage<s>Wrong password, <a href="resetpass.html>click here to reset!</a>', null)
+            callback('logMessage<s>Wrong password, <a href="resetpass.html">click here to reset!</a>', null)
         }
     }
     else{
@@ -78,19 +80,19 @@ function login(username, password, callback){
    })
 }
 
-function signup(fullname, email, username, password){
+function signup(fullname, email, username, password, callback){
     let user = User.findOne({username: username}, function(err, res){
      if(err) throw err
      if(res){
         console.log('User already exists!')
-        return 'logMessage<s>User already exists!'
+        callback('logMessage<s>User already exists!', res)
      }
      else{
          let user = User.findOne({email: username}, function(err, res){
              if(err) throw err
              if(res){
                 console.log('User already exists!')
-                return 'logMessage<s>User already exists!'
+                callback('logMessage<s>User already exists!', res)
              }
              else{
                  let usersCount = User.count.length
@@ -104,6 +106,7 @@ function signup(fullname, email, username, password){
                  newUser.save(function(err){
                      if(err) throw err
                  })
+                 callback('logMessage<s>Account creation successful!', newUser)
              }
          })
      }
