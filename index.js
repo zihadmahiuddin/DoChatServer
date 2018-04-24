@@ -53,6 +53,9 @@ function login(username, password, callback){
    let user = User.findOne({username: username}, function(err, res){
     if(err) throw err
     if(res){
+        if(!res.activated){
+            callback('logMessage<s>Please activate your account first. Didn\'t receive an activation mail?<br /><p onclick="sendActivationMail()"Click here to resend!</p>', res)
+        }
         if(res.password == password){
             callback('logMessage<s>Login successful!', res)
         }
@@ -101,12 +104,13 @@ function signup(fullname, email, username, password, callback){
                    password: password,
                    email: email,
                    fullname: fullname,
-                   id: usersCount + 1
+                   id: usersCount + 1,
+                   activated: false
                  })
                  newUser.save(function(err){
                      if(err) throw err
                  })
-                 callback('logMessage<s>Account creation successful!', newUser)
+                 callback('logMessage<s>Account creation successful!<br />Take a look at your mailbox(including \'Spam\' category) to activate your account', newUser)
              }
          })
      }
