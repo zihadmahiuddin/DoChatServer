@@ -12,5 +12,6 @@ module.exports = new Schema({
             buddyId: Number, time: Date, text: String, type: Number
         }
     ],
-    activated: Boolean
+    activated: Boolean,
+    activationCode: String
 });
