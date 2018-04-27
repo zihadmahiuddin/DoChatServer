@@ -43,13 +43,13 @@ io.on('connection', (socket) => {
 
 const password_hash = password => {
     const salt = crypto.randomBytes(128).toString('base64');
-    const hash = pbkdf2(password, salt, 10000);
+    const hash = crypto.pbkdf2(password, salt, 10000);
 
     return { salt, hash };
 };
 
 const password_verify = (password, saltAndHash) => {
-    return saltAndHash.hash == pbkdf2(passwordAttempt, saltAndHash.salt, 10000);
+    return saltAndHash.hash == crypto.pbkdf2(passwordAttempt, saltAndHash.salt, 10000);
 };
 
 http.listen(9339, () => console.log('listening on *:3000'));
