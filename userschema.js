@@ -13,5 +13,6 @@ module.exports = new Schema({
         }
     ],
     activated: Boolean,
-    activationCode: String
+    activationCode: String,
+    passwordResetCode: String
 });
