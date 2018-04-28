@@ -16,8 +16,8 @@ io.on('connection', (socket) => {
 
             User.find({email})
                 .then(res => {
-                    if (res) {
-                        io.in(data.hash).emit('signup error', {
+                    if (!res) {
+                        return io.in(data.hash).emit('signup error', {
                             message: 'Email already exists.'
                         });
                     }
@@ -39,6 +39,36 @@ io.on('connection', (socket) => {
                 .catch(err => console.log('Some ERROR'));
         }
     });
+
+    socket.on('login', (data) => {
+        socket.join(data.hash);
+
+        if (data.email && data.password) {
+            User.findOne({email: data.email})
+                .then(res => {
+                    if (!res) {
+                        return io.in(data.hash).emit('login error', {
+                            message: 'These credetials not available'
+                        });
+                    }
+                    
+                    const isVerified = password_verify(data.password, {
+                        salt: res.salt,
+                        hash: res.hash
+                    })
+
+                    if (isVerified) {
+                        return io.in(data.hash).emit('login success', {
+                            message: 'Logged in',
+                            user: {
+                                username: res.username,
+                                email: res.email
+                            }
+                        });
+                    }
+                }).catch(err => console.log('SOME ERROR'));
+        }
+    });
 });
 
 const password_hash = password => {
@@ -52,4 +82,4 @@ const password_verify = (password, saltAndHash) => {
     return saltAndHash.hash == crypto.pbkdf2(passwordAttempt, saltAndHash.salt, 10000);
 };
 
-http.listen(9339, () => console.log('listening on *:3000'));
+http.listen(9339, () => console.log('listening on *:9339'));
