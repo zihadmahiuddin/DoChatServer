@@ -5,7 +5,9 @@ const nodemailer = require('nodemailer')
 const express = require('express')
 const app = express()
 
-let usersDb = mongoose.createConnection('mongodb://127.0.0.1:27017/usersDb')
+
+let usersDb = mongoose.createConnection('mongodb://dochat:dochatsrv@127.0.0.1:27017/usersDb')
+
 let User = usersDb.model('user', userSchema)
 
 function login(username, password, callback) {
